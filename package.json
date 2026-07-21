@@ -1,0 +1,17 @@
+{
+  "name": "lufs-web-sampler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A browser-native sampler — Koala's soul, honestly scoped to the web — built on a verifiable, portable DSP core.",
+  "license": "GPL-3.0-or-later",
+  "workspaces": ["packages/sampler-core", "packages/app"],
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "test": "node --test packages/sampler-core/test/core.test.ts",
+    "precheck": "node scripts/precheck.mjs",
+    "build": "npm run build --workspace @lufs/web-sampler-app",
+    "verify": "node scripts/verify-artifact.mjs",
+    "ci": "npm run precheck && npm test && npm run build && npm run verify"
+  }
+}

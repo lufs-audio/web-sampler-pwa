@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#111214" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <title>LUFS Web Sampler</title>
+    <style>
+      :root { --bg:#111214; --panel:#17191c; --line:#2b2f34; --ink:#e9e7d8; --dim:#a3a196; --teal:#78BEBA; --red:#D35233; --gold:#D9A23D; }
+      * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+      body { margin:0; background:var(--bg); color:var(--ink); font-family:"Space Mono",ui-monospace,monospace; overscroll-behavior:none; }
+      #app { max-width:680px; margin:0 auto; padding:12px; }
+      h1 { font-size:14px; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin:6px 2px 14px; }
+      h1 b { color:var(--ink); }
+      .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0; }
+      button { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:9px 11px; font:inherit; font-size:12px; cursor:pointer; }
+      button:active { transform:translatey(1px); }
+      button.on { border-color:var(--teal); color:var(--teal); }
+      .pads { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+      .pad { aspect-ratio:1; border-radius:12px; background:var(--panel); border:1px solid var(--line); display:flex; flex-direction:column; justify-content:space-between; padding:8px; font-size:10px; color:var(--dim); user-select:none; }
+      .pad.has { border-color:#3a4550; color:var(--ink); }
+      .pad.sel { outline:2px solid var(--teal); }
+      .pad.lit { background:#22303014; border-color:var(--teal); }
+      .pad .id { font-size:8px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .pad .warn { color:var(--red); }
+      .seq { display:grid; grid-template-columns:repeat(16,1fr); gap:3px; margin-top:6px; }
+      .step { height:26px; border-radius:5px; background:var(--panel); border:1px solid var(--line); }
+      .step.on { background:var(--teal); }
+      .step.cur { outline:1px solid var(--gold); }
+      .meter { height:6px; background:var(--panel); border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+      .meter > i { display:block; height:100%; width:0; background:var(--teal); }
+      label { font-size:11px; color:var(--dim); }
+      input[type=range]{ accent-color:var(--teal); }
+      #start { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; z-index:9; }
+      #start button { padding:16px 26px; font-size:14px; border-color:var(--teal); color:var(--teal); }
+      small { color:var(--dim); }
+    </style>
+  </head>
+  <body>
+    <div id="start">
+      <h1 style="font-size:18px"><b>lufs</b><span style="color:var(--teal)">.</span> web sampler</h1>
+      <button id="startBtn">tap to start audio</button>
+      <small>throwaway UI · engine demo · v0.1</small>
+    </div>
+    <div id="app" hidden>
+      <h1><b>lufs</b><span style="color:var(--teal)">.</span> web sampler <small style="letter-spacing:0;text-transform:none">— throwaway UI</small></h1>
+      <div class="row">
+        <button id="play">▶ play</button>
+        <button id="stop">■ stop</button>
+        <label>bpm <span id="bpmv">90</span></label>
+        <input id="bpm" type="range" min="40" max="200" value="90" />
+        <div class="meter" style="flex:1;min-width:80px"><i id="meter"></i></div>
+      </div>
+      <div class="pads" id="pads"></div>
+      <div class="row">
+        <button id="rec">● rec → pad</button>
+        <button id="chop">chop ×16</button>
+        <button id="pitchdn">pitch −</button>
+        <button id="pitchup">pitch +</button>
+        <button id="stretch2">stretch ×2</button>
+        <button id="crush">bitcrush</button>
+        <button id="norm">normalize</button>
+        <button id="clear">clear</button>
+      </div>
+      <div class="row">
+        <button id="resample">resample pattern → pad</button>
+        <button id="expPad">export pad .wav</button>
+        <button id="expMix">export mix .wav</button>
+        <button id="save">save</button>
+        <button id="load">load</button>
+        <input id="file" type="file" accept="audio/*" hidden />
+        <button id="loadFile">load file → pad</button>
+      </div>
+      <div class="seq" id="seq"></div>
+      <div class="row"><small id="status">select a pad to edit its sequence · pads verify on bake</small></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
