@@ -5,6 +5,7 @@ import {
   silence,
   slice,
   chopEqual,
+  resampleLinear,
   repitch,
   semitonesToRatio,
   timeStretch,
@@ -108,13 +109,17 @@ export class SamplerEngine {
   };
 
   // ---- lifecycle -------------------------------------------------------
-  /** MUST be called from inside a user-gesture handler (iOS unlock rule). */
-  async init(): Promise<void> {
+  /**
+   * MUST be called from inside a user-gesture handler (iOS unlock rule).
+   * `workletUrl` defaults to the served file; the single-file demo passes a
+   * Blob URL instead so it can run fully self-contained.
+   */
+  async init(workletUrl = 'sampler-processor.js'): Promise<void> {
     if (this.ctx) return;
     const ctx = new AudioContext();
     // iOS requires resume() synchronously inside the gesture, before any await.
     await ctx.resume();
-    await ctx.audioWorklet.addModule('sampler-processor.js');
+    await ctx.audioWorklet.addModule(workletUrl);
     const node = new AudioWorkletNode(ctx, 'sampler-processor', { outputChannelCount: [2] });
     node.port.onmessage = (e) => {
       if (e.data?.type === 'levels') this.emit('levels', { peak: e.data.peak, voices: e.data.voices });
@@ -140,6 +145,16 @@ export class SamplerEngine {
   }
   private emitState() {
     this.emit('state', this.state);
+  }
+
+  /** The AudioContext sample rate; pads are conformed to this on bake. */
+  getSampleRate(): number {
+    return this.sampleRate;
+  }
+
+  /** Assign an in-memory Signal directly to a pad (synth kits, tests, Amacher). */
+  loadSignalToPad(pad: number, sig: Signal): void {
+    this.setSource(pad, sig);
   }
 
   // ---- pad assignment --------------------------------------------------
@@ -356,6 +371,9 @@ export class SamplerEngine {
     const ps = this.state.pads[pad];
     if (!src) return;
     let buf = src;
+    // Conform any off-rate source (a 48k file in a 44.1k context, a synth kit)
+    // to the context rate so the dumb worklet plays it at the right speed.
+    if (buf.sampleRate !== this.sampleRate) buf = resampleLinear(buf, this.sampleRate);
     if (ps.pitchSemitones !== 0) buf = repitch(buf, semitonesToRatio(ps.pitchSemitones));
     if (ps.gainDb !== 0) buf = applyGain(buf, dbToLinear(ps.gainDb));
 

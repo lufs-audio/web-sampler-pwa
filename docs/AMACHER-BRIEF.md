@@ -9,7 +9,8 @@ The deal is the same as always: **Ciani owns the engine, Amacher owns the surfac
 ## 1. Stack context (what you're building on)
 
 - **Monorepo, npm workspaces.** `packages/sampler-core` = the verified pure-DSP crown jewel (don't touch). `packages/app` = where the UI lives.
-- **The UI you replace is throwaway** — [`packages/app/src/main.ts`](../packages/app/src/main.ts) + [`index.html`](../packages/app/index.html). It exists only to prove every engine method works end-to-end. Read it as a reference wiring, then delete it.
+- **The UI you replace is throwaway** — the wiring lives in [`packages/app/src/ui.ts`](../packages/app/src/ui.ts) (shared), with thin entries [`main.ts`](../packages/app/src/main.ts) (served app) and [`demo.ts`](../packages/app/src/demo.ts) (self-contained published demo), over [`index.html`](../packages/app/index.html). It exists only to prove every engine method works end-to-end. Read `ui.ts` as the reference wiring, then replace it.
+- **There is a live playable demo** — `npm run dev` locally, or `npm run build:demo` → a single self-contained `demo-standalone.html`. It auto-loads a synthesized drum kit (`demokit.ts`) + a starter pattern so it makes sound with no mic.
 - **Realtime split:** heavy DSP runs on the main thread (verified) and finished buffers are shipped to a dumb AudioWorklet that only plays/mixes/meters. You don't deal with any of that — you talk to `SamplerEngine`.
 - **Stack:** Vite 5 + TypeScript 5, **no runtime dependencies**. Bring whatever view layer you want (vanilla, Lit, Svelte, Solid — your call), but keep the bundle light and the light path (no WASM/threads) working. Dev server: `npm run dev`.
 - **Build/deploy** already wired per website-portability (`site.yaml`, `.nvmrc`, fail-closed `verify-artifact.mjs`, staged `ci/deploy.yml`). Don't break the verify gate — the build must still emit `index.html` + a hashed bundle + the worklet + manifest + sw.
@@ -26,7 +27,8 @@ const engine = new SamplerEngine();
 ### Lifecycle
 | Call | When |
 |---|---|
-| `await engine.init()` | **MUST be inside a user-gesture handler** (tap/click). iOS unlock rule — no `await` before it in your handler. Creates the AudioContext, loads the worklet, connects output. |
+| `await engine.init(workletUrl?)` | **MUST be inside a user-gesture handler** (tap/click). iOS unlock rule — no `await` before it in your handler. Creates the AudioContext, loads the worklet, connects output. `workletUrl` defaults to the served `sampler-processor.js`; the demo passes a Blob URL. |
+| `engine.getSampleRate()` | AudioContext rate — pads are conformed to it on bake, so you can hand it to a synth/analysis path. |
 
 ### Events — `engine.on(ev, cb)` returns an unsubscribe fn
 | Event | Payload | Use |
@@ -59,7 +61,8 @@ interface PadState {
 | Call | Effect |
 |---|---|
 | `await engine.loadFileToPad(pad, arrayBuffer)` | decode an audio file onto a pad |
-| `await engine.recordToPad(pad)` / `await engine.stopRecording()` | mic capture → pad (mono on iOS) |
+| `engine.loadSignalToPad(pad, signal)` | assign an in-memory `Signal` directly (synth kits, tests) |
+| `await engine.recordToPad(pad)` / `await engine.stopRecording()` | mic capture → pad (mono on iOS; wrap in try/catch — blocked in sandboxed iframes) |
 | `engine.chopToPads(sourcePad, n, startPad?)` | slice a pad into `n` gapless tiles across consecutive pads |
 | `engine.clearPad(pad)` | empty a pad (also clears its OPFS file) |
 
