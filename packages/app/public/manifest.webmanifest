@@ -1,0 +1,14 @@
+{
+  "name": "LUFS Web Sampler",
+  "short_name": "LUFS Sampler",
+  "description": "Record anything, chop it, sequence it, mangle it — a browser-native sampler. Koala's soul, honestly scoped to the web.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111214",
+  "theme_color": "#111214",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

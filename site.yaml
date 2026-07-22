@@ -1,0 +1,35 @@
+# Neutral, target-independent build manifest (website-portability KB, rule 01).
+# The host is a swappable adapter; this file is the source of truth for how the
+# site is built and where its output lives.
+name: lufs-web-sampler
+description: Browser-native sampler PWA built on a verifiable DSP core.
+
+build:
+  node_version_file: .nvmrc
+  install: npm ci
+  test: npm test
+  command: npm run build
+  verify: npm run verify
+  output_dir: packages/app/dist
+
+routes:
+  spa: true          # single entry; unknown paths fall back to index.html
+  base: relative     # built with base './' so it runs at any domain/subpath
+
+pwa:
+  service_worker: sw.js
+  manifest: manifest.webmanifest
+  # cross-origin isolation is NOT required today (no SharedArrayBuffer / WASM
+  # threads yet). If/when the core moves hot paths to threaded WASM, set:
+  #   Cross-Origin-Opener-Policy: same-origin
+  #   Cross-Origin-Embedder-Policy: require-corp
+
+deploy:
+  # Primary managed edge per the KB is Cloudflare Pages (Git integration).
+  # The output-branch adapter (hosting-provider-static-deploy) is the fallback
+  # for pull-based static hosts and DR.
+  primary: cloudflare-pages
+  adapter: output-branch
+  output_branch: deploy
+
+domains: []          # none assigned yet

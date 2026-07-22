@@ -1,0 +1,42 @@
+# STAGED workflow — the GitHub integration token cannot write .github/workflows/.
+# A human/local agent activates this with:
+#   git mv ci/deploy.yml .github/workflows/deploy.yml && git commit && git push
+#
+# website-portability output-branch adapter, fail-closed:
+#   checkout -> node (.nvmrc) -> npm ci -> precheck -> test -> build
+#     -> VERIFY artifact -> retain off-host -> publish to `deploy` branch
+# Pin the third-party actions to commit SHAs before this goes live (KB security).
+name: build-verify-deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # least privilege: only what publishing the output branch needs
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run precheck      # DSP contract must pass first
+      - run: npm test              # full metamorphic battery
+      - run: npm run build         # build ONCE
+      - run: npm run verify        # fail-closed: exit 0 is not enough
+      - uses: actions/upload-artifact@v4   # retain the build off-host (DR)
+        with:
+          name: site-dist
+          path: packages/app/dist
+          if-no-files-found: error
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: packages/app/dist
+          publish_branch: deploy

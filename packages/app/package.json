@@ -1,0 +1,21 @@
+{
+  "name": "@lufs/web-sampler-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Throwaway UI + realtime shell for the LUFS Web Sampler. The engine is the deliverable; this UI only exercises it.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lufs/sampler-core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
