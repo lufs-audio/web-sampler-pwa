@@ -1,81 +1,434 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#111214" />
-    <link rel="manifest" href="manifest.webmanifest" />
-    <title>LUFS Web Sampler</title>
-    <style>
-      :root { --bg:#111214; --panel:#17191c; --line:#2b2f34; --ink:#e9e7d8; --dim:#a3a196; --teal:#78BEBA; --red:#D35233; --gold:#D9A23D; }
-      * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-      body { margin:0; background:var(--bg); color:var(--ink); font-family:"Space Mono",ui-monospace,monospace; overscroll-behavior:none; }
-      #app { max-width:680px; margin:0 auto; padding:12px; }
-      h1 { font-size:14px; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin:6px 2px 14px; }
-      h1 b { color:var(--ink); }
-      .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0; }
-      button { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:9px 11px; font:inherit; font-size:12px; cursor:pointer; }
-      button:active { transform:translatey(1px); }
-      button.on { border-color:var(--teal); color:var(--teal); }
-      .pads { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-      .pad { aspect-ratio:1; border-radius:12px; background:var(--panel); border:1px solid var(--line); display:flex; flex-direction:column; justify-content:space-between; padding:8px; font-size:10px; color:var(--dim); user-select:none; }
-      .pad.has { border-color:#3a4550; color:var(--ink); }
-      .pad.sel { outline:2px solid var(--teal); }
-      .pad.lit { background:#22303014; border-color:var(--teal); }
-      .pad .id { font-size:8px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .pad .warn { color:var(--red); }
-      .seq { display:grid; grid-template-columns:repeat(16,1fr); gap:3px; margin-top:6px; }
-      .step { height:26px; border-radius:5px; background:var(--panel); border:1px solid var(--line); }
-      .step.on { background:var(--teal); }
-      .step.cur { outline:1px solid var(--gold); }
-      .meter { height:6px; background:var(--panel); border:1px solid var(--line); border-radius:4px; overflow:hidden; }
-      .meter > i { display:block; height:100%; width:0; background:var(--teal); }
-      label { font-size:11px; color:var(--dim); }
-      input[type=range]{ accent-color:var(--teal); }
-      #start { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; z-index:9; }
-      #start button { padding:16px 26px; font-size:14px; border-color:var(--teal); color:var(--teal); }
-      small { color:var(--dim); }
-    </style>
-  </head>
-  <body>
-    <div id="start">
-      <h1 style="font-size:18px"><b>lufs</b><span style="color:var(--teal)">.</span> web sampler</h1>
-      <button id="startBtn">tap to start audio</button>
-      <small>throwaway UI · engine demo · v0.1</small>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#111214" />
+<link rel="manifest" href="manifest.webmanifest" />
+<title>LUFS Web Sampler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================= LUFS tokens */
+:root{
+  --ground:#111214; --panel:#17181b; --panel2:#1d1f23;
+  --cream:#fbf9e2; --muted:rgba(251,249,226,.62); --faint:rgba(251,249,226,.34);
+  --hair:rgba(251,249,226,.12); --hair2:rgba(251,249,226,.07);
+  --teal:#78BEBA; --red:#D35233; --dusty:#9FC1D0; --terra:#C8654A; --gold:#D9A23D; --blue:#2069af;
+  --mono:'Space Mono',ui-monospace,monospace;
+  --disp:'Host Grotesk',system-ui,sans-serif;
+  --body:'Public Sans',system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ground); color:var(--cream);
+  font-family:var(--body); font-weight:300; -webkit-font-smoothing:antialiased;
+  min-height:100vh; overflow-x:hidden; cursor:none;
+}
+body.reduce-motion *{animation:none!important;transition:none!important}
+@media (hover:none){ body,button{cursor:auto} }
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:none}
+@media (hover:none){ button{cursor:pointer} }
+::selection{background:var(--teal);color:#0b0c0d}
+.sec-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
+
+/* ============================================================= cursor */
+.cur-dot,.cur-ring{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;border-radius:50%;mix-blend-mode:difference;will-change:transform}
+.cur-dot{width:6px;height:6px;background:var(--cream)}
+.cur-ring{width:30px;height:30px;border:1px solid rgba(251,249,226,.7);transition:width .18s,height .18s}
+.cur-ring.hot{width:52px;height:52px;border-color:var(--teal)}
+@media (hover:none){.cur-dot,.cur-ring{display:none}}
+
+/* ============================================================= start */
+#start{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:24px;text-align:center;background:radial-gradient(120% 120% at 50% 40%,#191b1f 0%,#111214 70%);padding:32px}
+#start .mark{font-family:var(--disp);font-weight:800;font-size:clamp(3rem,11vw,6.4rem);letter-spacing:-.04em;line-height:.9}
+#start .mark .dot{color:var(--teal)}
+#start .sub{max-width:46ch;color:var(--muted);font-size:1.02rem;line-height:1.6}
+#start .go{margin-top:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.22em;font-size:.8rem;
+  padding:18px 40px;border:1px solid var(--teal);border-radius:2px;color:var(--teal);transition:.2s var(--ease)}
+#start .go:hover{background:var(--teal);color:#0b0c0d}
+#start .tiny{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:var(--faint);text-transform:uppercase}
+.pulse{position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid var(--hair);animation:pl 3.2s var(--ease) infinite}
+@keyframes pl{0%{transform:scale(.4);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+
+/* ============================================================= chrome */
+#chrome{position:sticky;top:0;z-index:120;display:none;align-items:center;justify-content:space-between;gap:14px;
+  padding:13px clamp(14px,4vw,40px);background:rgba(17,18,20,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--hair)}
+#chrome .brand{display:flex;align-items:baseline;gap:12px;min-width:0}
+#chrome .word{font-family:var(--disp);font-weight:800;font-size:1.4rem;letter-spacing:-.03em}
+#chrome .word .dot{color:var(--teal)}
+#chrome .tag{font-family:var(--mono);font-size:.55rem;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+#chrome .right{display:flex;align-items:center;gap:10px}
+.switch{display:flex;border:1px solid var(--hair);border-radius:3px;overflow:hidden}
+.switch button{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:9px 15px;color:var(--muted);transition:.18s var(--ease);border-right:1px solid var(--hair)}
+.switch button:last-child{border-right:none}
+.switch button.on{background:var(--teal);color:#0b0c0d;font-weight:700}
+.switch button:not(.on):hover{color:var(--cream);background:var(--hair2)}
+.gearbtn{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--hair);border-radius:3px;padding:9px 13px;color:var(--muted);transition:.16s var(--ease)}
+.gearbtn:hover{border-color:var(--teal);color:var(--teal)}
+.gearbtn .cog{font-size:.85rem;line-height:1}
+.tag-hide{}
+@media (max-width:620px){ #chrome .tag{display:none} .gearbtn .lbl{display:none} }
+
+/* ios note */
+#ios{display:none;align-items:center;gap:10px;justify-content:center;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--hair);
+  font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#ios b{color:var(--gold);font-weight:700}
+#ios .x{margin-left:6px;color:var(--faint);font-size:.9rem}
+
+/* ============================================================= stage */
+#stage{display:none;padding:clamp(16px,3vw,38px);max-width:1240px;margin:0 auto}
+.status{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;color:var(--muted);margin-top:16px;min-height:1em}
+
+/* shared buttons */
+.tbtn{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:.68rem;border:1px solid var(--hair);border-radius:3px;padding:12px 16px;color:var(--cream);transition:.16s var(--ease);text-align:center}
+.tbtn:hover{border-color:var(--teal);color:var(--teal)}
+.tbtn.play.on{background:var(--teal);color:#0b0c0d;border-color:var(--teal)}
+.abtn{font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;font-size:.6rem;border:1px solid var(--hair);border-radius:3px;padding:10px;color:var(--muted);transition:.16s var(--ease);text-align:center}
+.abtn:hover{border-color:var(--teal);color:var(--teal);background:var(--hair2)}
+.abtn.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* labelled slider */
+.field{display:flex;flex-direction:column;gap:7px}
+.field .flabel{display:flex;justify-content:space-between;align-items:baseline}
+.field .flabel .k{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.field .flabel .v{font-family:var(--disp);font-weight:700;font-size:1.05rem;color:var(--cream)}
+.field .flabel .v.t{color:var(--teal)}
+input[type=range]{-webkit-appearance:none;appearance:none;height:3px;background:var(--hair);border-radius:3px;outline:none;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:none}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:var(--teal)}
+@media(hover:none){input[type=range]::-webkit-slider-thumb{cursor:pointer}}
+
+.meterwrap{height:5px;border-radius:3px;background:var(--hair);overflow:hidden}
+.meterwrap .m{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .06s linear}
+
+/* resample hero */
+.resample{border:1px solid var(--teal);border-radius:12px;padding:16px;width:100%;text-align:left;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(120,190,186,.15),rgba(120,190,186,.03));transition:.18s var(--ease)}
+.resample:hover{background:linear-gradient(160deg,rgba(120,190,186,.27),rgba(120,190,186,.07))}
+.resample .big{font-family:var(--disp);font-weight:800;font-size:1.35rem;letter-spacing:-.02em;color:var(--teal);display:flex;align-items:center;gap:9px}
+.resample .sm{font-family:var(--mono);font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.bounce-flash{animation:bflash .6s var(--ease)}
+@keyframes bflash{0%{box-shadow:0 0 0 0 rgba(120,190,186,.7)}100%{box-shadow:0 0 0 26px rgba(120,190,186,0)}}
+.sweep{position:absolute;top:0;bottom:0;width:32%;left:-40%;background:linear-gradient(90deg,transparent,rgba(120,190,186,.45),transparent);pointer-events:none}
+.sweep.go{animation:sw .7s var(--ease)}
+@keyframes sw{to{left:120%}}
+
+/* shared: MPC-style single-track step lane (now used by Grid + Waveform) */
+.steplane{border:1px solid var(--hair);border-radius:10px;padding:14px;background:var(--panel)}
+.steplane .lh{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;gap:10px;flex-wrap:wrap}
+.steplane .lh .t{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.steplane .lh .t b{color:var(--teal)}
+.steplane .lh .meta{font-family:var(--mono);font-size:.58rem;color:var(--muted)}
+.steplane .cells{display:grid;grid-template-columns:repeat(16,1fr);gap:5px}
+.steplane .cell{height:38px;border-radius:5px;background:#191b1e;border:1px solid var(--hair2);transition:.1s var(--ease)}
+.steplane .cell:nth-child(4n+1){border-left:1px solid var(--hair)}
+.steplane .cell.on{background:var(--teal)}
+.steplane .cell.cur{outline:2px solid var(--gold);outline-offset:-2px}
+.steplane .cell.on.cur{background:var(--gold)}
+.steplane .cell.hidden{display:none}
+
+/* shared: MPC-style per-pad corner pattern dots */
+.minidots{display:flex;gap:2px;flex-wrap:wrap;max-width:78px;justify-content:flex-end}
+.minidots i{width:4px;height:4px;border-radius:50%;background:var(--hair);display:block}
+.minidots i.on{background:var(--teal)}
+.minidots i.cur{background:var(--gold)}
+
+/* ================================================================ WAVEFORM */
+.wave .scope{border:1px solid var(--hair);border-radius:10px;background:var(--panel);padding:12px;margin-bottom:16px}
+.wave .scope canvas{width:100%;height:88px;display:block}
+.wave .scopehd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.wave .cols{display:grid;grid-template-columns:minmax(0,1fr) 288px;gap:clamp(16px,2.2vw,30px);align-items:start}
+.wave .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wave .tile{border:1px solid var(--hair);border-radius:9px;background:var(--panel);padding:9px;position:relative;overflow:hidden;transition:.16s var(--ease);user-select:none}
+.wave .tile.sel{border-color:var(--teal)}
+.wave .tile.empty{border-style:dashed;border-color:var(--hair2);background:#141517}
+.wave .tile.unverified{border-color:rgba(211,82,51,.55)}
+.wave .tile .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:6px;min-height:14px}
+.wave .tile .num{font-family:var(--mono);font-size:.55rem;color:var(--muted)}
+.wave .tile canvas{width:100%;height:40px;display:block;margin-bottom:7px}
+.wave .tile .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.wave .tile .nm{font-family:var(--disp);font-weight:600;font-size:.8rem}
+.wave .tile .id{font-family:var(--mono);font-size:.5rem;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wave .tile .du{font-family:var(--mono);font-size:.52rem;color:var(--muted)}
+.wave .tile.lit{box-shadow:0 0 0 1px var(--teal),0 0 22px rgba(120,190,186,.35)}
+.wave .tile.empty .nm{color:var(--faint)}
+.wave .tile .unv{color:var(--red)}
+.wave .side{display:flex;flex-direction:column;gap:13px}
+.wave .card{border:1px solid var(--hair);border-radius:10px;background:var(--panel);padding:15px;display:flex;flex-direction:column;gap:13px}
+.wave .transport{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wave .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.wave .steplane{margin-top:16px}
+
+/* ==================================================================== GRID */
+.grid .gwrap{font-family:var(--mono)}
+.grid .bar{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;border:1px solid var(--hair);border-radius:6px;padding:14px 16px;margin-bottom:16px;background:var(--panel)}
+.grid .bar .stat{display:flex;flex-direction:column;gap:3px}
+.grid .bar .stat .k{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.grid .bar .stat .v{font-size:.92rem;color:var(--cream);font-weight:700}
+.grid .bar .stat .v.t{color:var(--teal)}
+.grid .bar .sld{display:flex;flex-direction:column;gap:6px;min-width:130px;flex:1}
+.grid .bar .sld .lab{display:flex;justify-content:space-between;align-items:baseline}
+.grid .bar .sld .lab .k{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.grid .bar .sld .lab .v{font-size:.72rem;color:var(--teal);font-weight:700}
+.grid .bar .tbtns{display:flex;gap:8px}
+.grid .gbtn{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--hair);padding:9px 13px;color:var(--muted);transition:.14s var(--ease)}
+.grid .gbtn:hover{border-color:var(--teal);color:var(--teal)}
+.grid .gbtn.on{background:var(--teal);color:#0b0c0d;border-color:var(--teal)}
+.grid .matrix{border:1px solid var(--hair);border-radius:6px;overflow:hidden}
+.grid .mhead,.grid .mrow{display:grid;grid-template-columns:26px 92px 48px 34px 40px repeat(16,1fr);align-items:center}
+.grid .mhead{border-bottom:1px solid var(--hair);background:var(--panel2)}
+.grid .mhead>div{font-size:.5rem;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);padding:9px 6px;text-align:center}
+.grid .mhead>div.l{text-align:left}
+.grid .mrow{border-bottom:1px solid var(--hair2);transition:background .14s}
+.grid .mrow:last-child{border-bottom:none}
+.grid .mrow:hover{background:var(--hair2)}
+.grid .mrow.sel{background:rgba(120,190,186,.08)}
+.grid .mrow.sel .idx{color:var(--teal)}
+.grid .mrow>div{padding:0 6px;font-size:.62rem;height:33px;display:flex;align-items:center}
+.grid .mrow .idx{justify-content:center;color:var(--muted)}
+.grid .mrow .id{color:var(--faint);font-size:.53rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid .mrow .id.unv{color:var(--red)}
+.grid .mrow .du,.grid .mrow .pi,.grid .mrow .ga{justify-content:flex-end;color:var(--muted);font-size:.55rem}
+.grid .mrow .cell{padding:0;height:33px;border-left:1px solid var(--hair2)}
+.grid .mrow .cell:nth-child(5n+6){border-left:1px solid var(--hair)}
+.grid .cellin{width:100%;height:100%;transition:.08s}
+.grid .cell.on .cellin{background:var(--teal)}
+.grid .cell.cur .cellin{box-shadow:inset 0 0 0 2px var(--gold)}
+.grid .mrow.empty .id{color:var(--hair)}
+.grid .mrow.empty .cell{opacity:.4}
+.grid .steplane{margin-top:16px}
+.grid .resample{display:flex;align-items:center;gap:14px;margin-top:16px}
+.grid .resample .rl{flex:1}
+.grid .resample .rl .t{color:var(--teal);font-size:.82rem;font-weight:700;letter-spacing:.02em}
+.grid .resample .rl .d{color:var(--muted);font-size:.53rem;letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+.grid .resample .run{border:1px solid var(--teal);color:var(--teal);padding:11px 20px;font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;transition:.16s;border-radius:4px}
+.grid .resample .run:hover{background:var(--teal);color:#0b0c0d}
+.grid .ops{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+.grid .ops .lbl{font-size:.53rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-right:4px;font-family:var(--mono)}
+.grid .meterrow{display:flex;align-items:center;gap:12px;margin-top:16px}
+.grid .meterrow .k{font-family:var(--mono);font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+.grid .meterrow .meterwrap{flex:1}
+
+/* ============================================================= settings drawer */
+#scrim{position:fixed;inset:0;z-index:290;background:rgba(8,9,10,.6);opacity:0;pointer-events:none;transition:opacity .22s var(--ease)}
+#scrim.open{opacity:1;pointer-events:auto}
+#settings{position:fixed;top:0;right:0;bottom:0;z-index:300;width:min(430px,100%);
+  background:var(--panel);border-left:1px solid var(--hair);transform:translateX(102%);transition:transform .26s var(--ease);
+  display:flex;flex-direction:column;box-shadow:-24px 0 60px rgba(0,0,0,.5)}
+#settings.open{transform:translateX(0)}
+#settings .shd{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--hair)}
+#settings .shd .t{font-family:var(--disp);font-weight:800;font-size:1.35rem;letter-spacing:-.02em}
+#settings .shd .x{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--hair);padding:8px 12px;border-radius:3px;transition:.16s}
+#settings .shd .x:hover{border-color:var(--red);color:var(--red)}
+#settings .sbody{overflow-y:auto;padding:6px 20px 40px;flex:1}
+.sset{padding:18px 0;border-bottom:1px solid var(--hair2)}
+.sset:last-child{border-bottom:none}
+.sset>.sh{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:13px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
+.srow:last-child{margin-bottom:0}
+.srow .sk{font-family:var(--body);font-size:.86rem;color:var(--cream)}
+.srow .sk .d{font-family:var(--mono);font-size:.54rem;letter-spacing:.06em;color:var(--faint);text-transform:uppercase;margin-top:3px}
+.spill{font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--hair);border-radius:100px;padding:5px 11px;color:var(--muted);white-space:nowrap}
+.spill.ok{color:var(--teal);border-color:rgba(120,190,186,.5)}
+.spill.no{color:var(--red);border-color:rgba(211,82,51,.5)}
+.spill.warn{color:var(--gold);border-color:rgba(217,162,61,.5)}
+.sbtn{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--hair);border-radius:4px;padding:10px 14px;color:var(--cream);transition:.16s var(--ease);white-space:nowrap}
+.sbtn:hover{border-color:var(--teal);color:var(--teal)}
+.sbtn.full{width:100%;text-align:center}
+.sbtn.danger:hover{border-color:var(--red);color:var(--red)}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg{display:flex;border:1px solid var(--hair);border-radius:4px;overflow:hidden}
+.seg button{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;padding:8px 14px;color:var(--muted);border-right:1px solid var(--hair)}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--teal);color:#0b0c0d;font-weight:700}
+.sabout{font-family:var(--mono);font-size:.56rem;line-height:1.7;color:var(--muted);letter-spacing:.04em}
+.sabout a{color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(120,190,186,.4)}
+
+/* ============================================================= mobile bottom bar */
+#mbar{position:fixed;left:0;right:0;bottom:0;z-index:130;display:none;align-items:center;gap:10px;
+  padding:10px clamp(12px,4vw,20px);padding-bottom:calc(10px + var(--safe-b));
+  background:rgba(20,21,24,.94);backdrop-filter:blur(14px);border-top:1px solid var(--hair)}
+#mbar button{border:1px solid var(--hair);border-radius:8px;height:46px;display:flex;align-items:center;justify-content:center;color:var(--cream);font-size:1.1rem;transition:.14s var(--ease)}
+#mbar .mplay{flex:0 0 auto;width:56px}
+#mbar .mplay.on{background:var(--teal);color:#0b0c0d;border-color:var(--teal)}
+#mbar .mbounce{flex:1;font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;gap:7px;color:var(--teal);border-color:rgba(120,190,186,.5)}
+#mbar .mgear{flex:0 0 auto;width:56px}
+#mbar .mbpm{flex:0 0 auto;font-family:var(--mono);font-size:.6rem;color:var(--muted);text-align:center;line-height:1.2}
+#mbar .mbpm b{display:block;color:var(--cream);font-size:.95rem}
+
+/* ============================================================= footer */
+#foot{display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:22px clamp(16px,4vw,40px);border-top:1px solid var(--hair);margin-top:30px}
+#foot .squares{display:flex;gap:4px}
+#foot .squares i{width:11px;height:11px;border-radius:2px;display:block}
+#foot .fl{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+#foot .fl b{color:var(--muted);font-weight:400}
+
+/* ============================================================= responsive */
+@media (max-width:900px){
+  .wave .cols{grid-template-columns:1fr}
+  .wave .side{order:-1}                 /* transport/resample above tiles on tablet */
+}
+@media (max-width:720px){
+  #chrome .word{font-size:1.25rem}
+  .grid .bar{gap:14px}
+  .grid .bar .sld{min-width:110px}
+}
+@media (max-width:640px){
+  #mbar{display:flex}
+  #stage{padding-bottom:96px}          /* room for mobile bar */
+  #foot{margin-bottom:76px}
+  .wave .tiles{grid-template-columns:repeat(2,1fr)}
+  .wave .transport,.wave .side .card .transport{grid-template-columns:1fr 1fr}
+  .grid .gwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .grid .matrix{min-width:560px}
+  .grid .mhead,.grid .mrow{grid-template-columns:22px 66px 40px repeat(16,1fr)}
+  .grid .mrow .pi,.grid .mhead .pi,.grid .mrow .ga,.grid .mhead .ga{display:none}
+  .grid .steplane .cell{height:44px}   /* fat, thumb-friendly on mobile */
+  .steplane .cells{gap:4px}
+}
+@media (max-width:420px){
+  .wave .tiles{grid-template-columns:repeat(2,1fr)}
+  .steplane .cells{grid-template-columns:repeat(8,1fr);grid-auto-rows:44px}  /* wrap to 2 rows of 8 */
+}
+@media (prefers-reduced-motion:reduce){ *{animation-duration:.001ms!important;transition-duration:.05ms!important} }
+
+/* ============================================================= drag-and-drop upload */
+body.dragging::after{content:'⤓  DROP AUDIO ONTO A PAD TO LOAD';position:fixed;top:0;left:0;right:0;z-index:250;text-align:center;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;padding:9px;background:rgba(120,190,186,.16);color:var(--teal);border-bottom:1px solid var(--teal)}
+.tile.drop-hot,.pad.drop-hot{border-color:var(--teal)!important;box-shadow:0 0 0 1px var(--teal),0 0 24px rgba(120,190,186,.45)!important}
+.grid .mrow.drop-hot{background:rgba(120,190,186,.16)!important}
+.grid .mrow.drop-hot .idx{color:var(--teal)}
+.wave .tile.empty .nm{letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="cur-dot"></div><div class="cur-ring"></div>
+
+<div id="start">
+  <div class="pulse"></div>
+  <div class="mark">lufs<span class="dot">.</span></div>
+  <div class="sec-label">web sampler · v0.1</div>
+  <div class="sub">A browser-native sampler — Koala's soul, honestly scoped to the web, on a verifiable DSP core. Drop in or record your own samples (or tap <b style="color:var(--teal);font-weight:400">demo kit</b>), sequence them, and resample the pattern back onto a pad to rework it.</div>
+  <button class="go" id="startBtn">tap to start audio</button>
+  <div class="tiny">audio needs a gesture · works on desktop + mobile</div>
+</div>
+
+<header id="chrome">
+  <div class="brand">
+    <span class="word">lufs<span class="dot">.</span></span>
+    <span class="tag">web sampler · v0.1</span>
+  </div>
+  <div class="right">
+    <nav class="switch" id="switch">
+      <button data-look="wave" class="on">Waveform</button>
+      <button data-look="grid">Grid</button>
+    </nav>
+    <button class="gearbtn" data-act="settings-open"><span class="cog">⚙</span><span class="lbl">settings</span></button>
+  </div>
+</header>
+<div id="ios">iOS is best-effort — <b>add to home screen</b>, mono mic, no Web MIDI<span class="x" id="iosx">✕</span></div>
+
+<main id="stage"></main>
+
+<footer id="foot">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="squares"><i style="background:var(--gold)"></i><i style="background:var(--teal)"></i><i style="background:var(--blue)"></i><i style="background:var(--red)"></i></div>
+    <span class="fl">lufs<span style="color:var(--teal)">.</span> audio</span>
+  </div>
+  <div class="fl"><b>engine:</b> ciani · verifiable dsp core &nbsp;·&nbsp; <b>surface:</b> amacher &nbsp;·&nbsp; synthesized data, real contract</div>
+</footer>
+
+<!-- mobile bottom bar -->
+<div id="mbar">
+  <button class="mplay" data-mbar="play" aria-label="play / stop">▶</button>
+  <div class="mbpm">BPM<b data-mbpm>90</b></div>
+  <button class="mbounce" data-act="resample">↺ bounce</button>
+  <button class="mgear" data-act="settings-open" aria-label="settings">⚙</button>
+</div>
+
+<!-- settings drawer -->
+<div id="scrim" data-act="settings-close"></div>
+<aside id="settings" aria-label="settings">
+  <div class="shd"><span class="t">Settings</span><button class="x" data-act="settings-close">close ✕</button></div>
+  <div class="sbody">
+
+    <div class="sset">
+      <div class="sh">Audio engine</div>
+      <div class="srow"><div class="sk">Context<div class="d">web audio</div></div><span class="spill" data-set="ctx">—</span></div>
+      <div class="srow"><div class="sk">Sample rate<div class="d">conformed on bake</div></div><span class="spill" data-set="sr">—</span></div>
+      <div class="srow"><div class="sk">Resume audio<div class="d">if suspended</div></div><button class="sbtn" data-act="resume-audio">resume</button></div>
+      <div class="field" style="margin-top:6px">
+        <div class="flabel"><span class="k">Master volume</span><span class="v t" data-set="masterv">90</span></div>
+        <input type="range" data-range="master" min="0" max="100" value="90" aria-label="master volume">
+      </div>
     </div>
-    <div id="app" hidden>
-      <h1><b>lufs</b><span style="color:var(--teal)">.</span> web sampler <small style="letter-spacing:0;text-transform:none">— throwaway UI</small></h1>
-      <div class="row">
-        <button id="play">▶ play</button>
-        <button id="stop">■ stop</button>
-        <label>bpm <span id="bpmv">90</span></label>
-        <input id="bpm" type="range" min="40" max="200" value="90" />
-        <div class="meter" style="flex:1;min-width:80px"><i id="meter"></i></div>
-      </div>
-      <div class="pads" id="pads"></div>
-      <div class="row">
-        <button id="rec">● rec → pad</button>
-        <button id="kit">demo kit</button>
-        <button id="chop">chop ×16</button>
-        <button id="pitchdn">pitch −</button>
-        <button id="pitchup">pitch +</button>
-        <button id="stretch2">stretch ×2</button>
-        <button id="crush">bitcrush</button>
-        <button id="norm">normalize</button>
-        <button id="clear">clear</button>
-      </div>
-      <div class="row">
-        <button id="resample">resample pattern → pad</button>
-        <button id="expPad">export pad .wav</button>
-        <button id="expMix">export mix .wav</button>
-        <button id="save">save</button>
-        <button id="load">load</button>
-        <input id="file" type="file" accept="audio/*" hidden />
-        <button id="loadFile">load file → pad</button>
-      </div>
-      <div class="seq" id="seq"></div>
-      <div class="row"><small id="status">select a pad to edit its sequence · pads verify on bake</small></div>
+
+    <div class="sset">
+      <div class="sh">Permissions</div>
+      <div class="srow"><div class="sk">Microphone<div class="d">record → pad</div></div><div style="display:flex;gap:8px;align-items:center"><span class="spill" data-set="mic">idle</span><button class="sbtn" data-act="req-mic">request</button></div></div>
+      <div class="srow"><div class="sk">MIDI input<div class="d">web midi · not on ios</div></div><div style="display:flex;gap:8px;align-items:center"><span class="spill" data-set="midi">idle</span><button class="sbtn" data-act="req-midi">request</button></div></div>
     </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+    <div class="sset">
+      <div class="sh">Pattern</div>
+      <div class="srow"><div class="sk">Steps<div class="d">per bar</div></div>
+        <div class="seg" id="stepseg">
+          <button data-act="set-steps" data-arg="8">8</button>
+          <button data-act="set-steps" data-arg="16" class="on">16</button>
+        </div></div>
+      <div class="field" style="margin-top:4px">
+        <div class="flabel"><span class="k">Tempo</span><span class="v t" data-set="bpmv">90</span> <span class="k" style="align-self:center">bpm</span></div>
+        <input type="range" data-range="bpm" min="60" max="180" value="90" aria-label="tempo bpm">
+      </div>
+    </div>
+
+    <div class="sset">
+      <div class="sh">Export</div>
+      <div class="sgrid">
+        <button class="sbtn" data-act="exppad">selected pad · wav</button>
+        <button class="sbtn" data-act="expmix">pattern mix · wav</button>
+      </div>
+      <div class="d" style="font-family:var(--mono);font-size:.52rem;letter-spacing:.08em;color:var(--faint);text-transform:uppercase;margin-top:9px">24-bit · rendered offline from the verified core</div>
+    </div>
+
+    <div class="sset">
+      <div class="sh">Project</div>
+      <div class="sgrid">
+        <button class="sbtn" data-act="save">save</button>
+        <button class="sbtn" data-act="load">load</button>
+        <button class="sbtn" data-act="reloadkit">reload demo kit</button>
+        <button class="sbtn danger" data-act="clearall">clear all pads</button>
+      </div>
+      <div class="d" style="font-family:var(--mono);font-size:.52rem;letter-spacing:.08em;color:var(--faint);text-transform:uppercase;margin-top:9px">patterns + params persist locally (opfs in production)</div>
+    </div>
+
+    <div class="sset">
+      <div class="sh">Install</div>
+      <div class="srow"><div class="sk">Add to home screen<div class="d">offline-capable pwa</div></div><button class="sbtn" data-act="install" data-set="install">install</button></div>
+    </div>
+
+    <div class="sset">
+      <div class="sh">System</div>
+      <div class="srow"><div class="sk">Verified pads<div class="d">failed bakes shown red</div></div><span class="spill" data-set="verified">—</span></div>
+      <div class="srow"><div class="sk">Reduce motion<div class="d">disable animation</div></div>
+        <div class="seg" id="motionseg"><button data-act="motion" data-arg="off" class="on">off</button><button data-act="motion" data-arg="on">on</button></div></div>
+      <div class="sabout" style="margin-top:12px">
+        lufs<span style="color:var(--teal)">.</span> web sampler — v0.1<br>
+        engine: ciani · verifiable dsp core<br>
+        surface: amacher<br>
+        repo: <a href="https://github.com/danialrami/lufs-web-sampler" target="_blank" rel="noopener noreferrer">danialrami/lufs-web-sampler</a>
+      </div>
+    </div>
+
+  </div>
+</aside>
+<script type="module" src="/src/main.ts"></script>
+</body>
 </html>
