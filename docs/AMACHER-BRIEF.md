@@ -88,6 +88,12 @@ const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
 a.download = 'mix.wav'; a.click(); URL.revokeObjectURL(a.href);
 ```
 
+### Visualization
+| Call | Use |
+|---|---|
+| `engine.getAnalyser()` → `AnalyserNode \| null` | live master scope + FFT (Waveform hero); same API your prototype's analyser used |
+| `engine.peaks(pad, columns)` → `{ min, max } \| null` | static per-pad waveform thumbnails (per-column min/max) |
+
 ### Minimal wiring skeleton
 ```ts
 startButton.onclick = async () => {
@@ -123,11 +129,16 @@ Make **resample-as-instrument** feel like the center of gravity, not a buried bu
 - Keep the **install/offline** story intact (manifest + `sw.js` are wired; don't strip them).
 - Don't add COOP/COEP headers yet — no SharedArrayBuffer today; adding them breaks third-party embeds for no gain.
 
-## 5. Gaps I (Ciani) own — tell me what you need
+## 5. Visualization surface — DELIVERED (was the two open items)
 
-- **No live/per-pad visualization stream yet.** The worklet posts only a master **peak** (`'levels'`). If your chosen direction needs per-pad meters, input monitoring, or an FFT/waveform stream (Direction 2 especially), that's a **new worklet→main message channel I need to build** — same shape as the `lufs-recorder` levels-stream gap. Ping me with exactly what signal you want (per-voice peak? input RMS? FFT bins? waveform peaks?) and I'll add it to the engine + worklet behind a clean event.
-- **Sequencer timing** is a lookahead `setTimeout` scheduler — good enough to build against; if you need sample-accurate playhead sync for animation, I'll tighten it.
-- **Waveform thumbnails**: I can add a cheap `peaks(pad, n)` helper to the engine (downsampled min/max per pixel column) if you want waveform rendering — ask and it's yours.
+Both things the UI study asked me to confirm are now in the engine (v0.1), verified:
+
+- **`engine.getAnalyser(): AnalyserNode`** — the live master scope + FFT. `node → analyser → destination` is wired in `init()`, so `getFloatTimeDomainData()` / `getFloatFrequencyData()` on it drive the Waveform hero scope. This is the **same AnalyserNode API your prototype already reads**, so that code transfers 1:1 — swap the demo-only analyser for `engine.getAnalyser()`.
+- **`engine.peaks(pad, columns): { min, max } | null`** — per-column min/max of a pad's baked buffer for waveform **thumbnails**. Pure, delegates to the verified core (`peaks()` has its own test). Returns `null` for an empty pad.
+
+Still deferred (say the word if a direction needs them):
+- **Per-pad *live* meters** — the analyser is master-bus only; per-voice live metering is a heavier worklet change. Per-pad *static* thumbnails are covered by `peaks()`.
+- **Sequencer timing** — a lookahead `setTimeout` scheduler; fine to build against. If you need sample-accurate playhead animation, I'll tighten it.
 
 ## 6. Init prompt (paste this to kick off the session)
 

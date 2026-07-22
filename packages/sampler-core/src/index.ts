@@ -11,6 +11,7 @@ export {
   concat,
   toMono,
   measure,
+  peaks,
   isBounded,
 } from './buffer.ts';
 

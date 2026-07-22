@@ -80,6 +80,34 @@ export function measure(sig: Signal): Levels {
   return { peak, peakDbfs: db(peak), rms, rmsDbfs: db(rms) };
 }
 
+/**
+ * Downsample to per-column min/max pairs for waveform thumbnails. Deterministic
+ * and pure — the UI renders `columns` vertical bars from min[c]..max[c]. Silent
+ * or empty input yields all-zero columns. `min[c] <= max[c]` always holds.
+ */
+export function peaks(sig: Signal, columns: number): { min: Float32Array; max: Float32Array } {
+  if (columns <= 0) throw new Error('peaks: columns must be >= 1');
+  const mono = toMono(sig);
+  const n = mono.length;
+  const min = new Float32Array(columns);
+  const max = new Float32Array(columns);
+  if (n === 0) return { min, max };
+  for (let c = 0; c < columns; c++) {
+    const start = Math.floor((c * n) / columns);
+    const end = Math.max(start + 1, Math.floor(((c + 1) * n) / columns));
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (let i = start; i < end && i < n; i++) {
+      const v = mono[i];
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    min[c] = Number.isFinite(lo) ? lo : 0;
+    max[c] = Number.isFinite(hi) ? hi : 0;
+  }
+  return { min, max };
+}
+
 /** True if every sample is finite and within [-limit, limit]. */
 export function isBounded(sig: Signal, limit = 1.0): boolean {
   for (const c of sig.channels) {

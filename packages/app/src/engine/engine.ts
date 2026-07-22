@@ -15,6 +15,7 @@ import {
   normalizePeak,
   encodeWav,
   contentHash,
+  peaks,
   assertFiniteBounded,
   assertNonEmpty,
   type CheckResult,
@@ -84,6 +85,7 @@ function emptyPad(i: number, steps: number): PadState {
 export class SamplerEngine {
   private ctx: AudioContext | null = null;
   private node: AudioWorkletNode | null = null;
+  private analyser: AnalyserNode | null = null;
   private recorder: Recorder | null = null;
   private listeners: Record<EngineEvent, Set<Listener>> = { state: new Set(), levels: new Set(), step: new Set() };
 
@@ -124,9 +126,16 @@ export class SamplerEngine {
     node.port.onmessage = (e) => {
       if (e.data?.type === 'levels') this.emit('levels', { peak: e.data.peak, voices: e.data.voices });
     };
-    node.connect(ctx.destination);
+    // node -> analyser -> destination. The analyser gives the UI a real master
+    // scope + FFT (getFloatTimeDomainData / getFloatFrequencyData) with the exact
+    // same API the design prototype read, so the scope wiring transfers 1:1.
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    node.connect(analyser);
+    analyser.connect(ctx.destination);
     this.ctx = ctx;
     this.node = node;
+    this.analyser = analyser;
     this.recorder = new Recorder(ctx);
     this.sampleRate = ctx.sampleRate;
     this.setMaster(this.state.masterGain);
@@ -155,6 +164,25 @@ export class SamplerEngine {
   /** Assign an in-memory Signal directly to a pad (synth kits, tests, Amacher). */
   loadSignalToPad(pad: number, sig: Signal): void {
     this.setSource(pad, sig);
+  }
+
+  /**
+   * Live master scope/FFT source. node -> analyser -> destination is wired in
+   * init(), so `getFloatTimeDomainData` / `getFloatFrequencyData` on this node
+   * drive the Waveform look's hero scope. (Per-pad live meters are out of scope
+   * for v0.1 — use peaks() for static per-pad thumbnails.)
+   */
+  getAnalyser(): AnalyserNode | null {
+    return this.analyser;
+  }
+
+  /**
+   * Per-column min/max of a pad's baked buffer for waveform thumbnails.
+   * Returns null for an empty/absent pad. Delegates to the verified core.
+   */
+  peaks(pad: number, columns: number): { min: Float32Array; max: Float32Array } | null {
+    const buf = this.baked.get(pad);
+    return buf ? peaks(buf, columns) : null;
   }
 
   // ---- pad assignment --------------------------------------------------

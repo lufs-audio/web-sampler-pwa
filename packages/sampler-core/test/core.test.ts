@@ -17,6 +17,7 @@ import {
   normalizePeak,
   encodeWav,
   decodeWav,
+  peaks,
   contentHash,
   runContract,
   rmsError,
@@ -118,6 +119,24 @@ test('contentHash is stable and sample-sensitive', () => {
   m.channels[0][100] += 0.3;
   assert.notEqual(contentHash(sig), contentHash(m));
   assert.match(contentHash(sig), /^lws-[0-9a-f]{8}$/);
+});
+
+test('peaks produce the requested columns with min<=max, bounded', () => {
+  const sig = sine(440, 0.5, 44100, 1, 0.9);
+  const { min, max } = peaks(sig, 100);
+  assert.equal(min.length, 100);
+  assert.equal(max.length, 100);
+  for (let c = 0; c < 100; c++) {
+    assert.ok(min[c] <= max[c], `column ${c}: min ${min[c]} > max ${max[c]}`);
+    assert.ok(max[c] <= 1.0001 && min[c] >= -1.0001);
+  }
+  // a full-amplitude sine should swing near ±0.9 somewhere across the columns
+  assert.ok(Math.max(...max) > 0.7 && Math.min(...min) < -0.7);
+});
+
+test('peaks of an empty signal are all-zero, not NaN', () => {
+  const { min, max } = peaks({ sampleRate: 44100, channels: [new Float32Array(0)] }, 32);
+  assert.ok(min.every((v) => v === 0) && max.every((v) => v === 0));
 });
 
 test('empty signal is handled without throwing', () => {
