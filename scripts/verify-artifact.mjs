@@ -141,6 +141,14 @@ if (DECLARED_ORIGINS) {
   const sw = existsSync(swPath) ? readFileSync(swPath, 'utf8') : '';
   need(/req(uest)?\.mode\s*===\s*['"]navigate['"]/.test(sw),
        "sw.js has no `mode === 'navigate'` branch; a host redirect on a navigation surfaces as ERR_FAILED");
+  // A navigate branch alone is NOT enough — a redirected response stays flagged
+  // after being stored in the Cache API (w3c/ServiceWorker#737), so precaching
+  // a URL the host 308s poisons the cached shell too.
+  const shellBlock = (sw.match(/const SHELL\s*=\s*\[[\s\S]*?\]/) || [''])[0];
+  need(!/index\.html/.test(shellBlock),
+       'SHELL precaches ./index.html, which the host 308s; the cached response keeps its redirected flag and cannot satisfy a navigation');
+  need(/\.redirected/.test(sw) && /new Response\(/.test(sw),
+       'navigate path does not rebuild a redirected response; a flagged response reaching respondWith is ERR_FAILED');
 }
 
 // The manifest's start_url must not be a path the host redirects, or the
