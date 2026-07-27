@@ -131,6 +131,31 @@ if (DECLARED_ORIGINS) {
   }
 }
 
+// The service worker MUST handle navigations explicitly. Navigation requests use
+// redirect mode "manual", so a SW answering one with a redirected response gets
+// ERR_FAILED. Cloudflare Pages 308s /index.html -> /, which hard-failed that URL
+// on the live deploy once the SW was active. Neither the artifact bytes nor a
+// source read reveal this — it only exists in the SW/host-redirect interaction.
+{
+  const swPath = join(DIST, 'sw.js');
+  const sw = existsSync(swPath) ? readFileSync(swPath, 'utf8') : '';
+  need(/req(uest)?\.mode\s*===\s*['"]navigate['"]/.test(sw),
+       "sw.js has no `mode === 'navigate'` branch; a host redirect on a navigation surfaces as ERR_FAILED");
+}
+
+// The manifest's start_url must not be a path the host redirects, or the
+// INSTALLED app launches into a redirect (and, with a SW active, an error page).
+{
+  const mp = join(DIST, 'manifest.webmanifest');
+  if (existsSync(mp)) {
+    try {
+      const su = JSON.parse(readFileSync(mp, 'utf8')).start_url;
+      need(typeof su === 'string' && !/\.html?$/i.test(su),
+           `manifest start_url ${JSON.stringify(su)} points at a .html path the host will redirect`);
+    } catch { /* manifest validity is reported elsewhere */ }
+  }
+}
+
 // generated host adapters must be present — if the renderer no-ops, the
 // no-cache intent on sw.js never reaches the host and clients pin stale logic.
 {
