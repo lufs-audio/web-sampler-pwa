@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "site_id": "lufs-web-sampler",
+  "source": {
+    "repository": "lufs-audio/web-sampler-pwa",
+    "commit": "49dcfde74d243f126a6fa47ccc6df6ec248ef773"
+  },
+  "build": {
+    "builder": "github-actions",
+    "command": "npm run ci",
+    "builtAt": "2026-07-27T05:20:12.786Z"
+  },
+  "artifact": {
+    "files": 14,
+    "contentId": "lws-bc42b50a",
+    "sha256": "bc42b50ae874f63de84f834d77e2b2cfd784713eea9961a13c5105500032530f"
+  }
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#111214"/>
+  <g fill="none" stroke="#78BEBA" stroke-width="18" stroke-linecap="round">
+    <path d="M96 256h40l24-90 40 180 32-120 28 70 24-40h132"/>
+  </g>
+  <circle cx="404" cy="256" r="16" fill="#D9A23D"/>
+  <text x="256" y="430" font-family="monospace" font-size="72" fill="#e9e7d8" text-anchor="middle">lufs<tspan fill="#78BEBA">.</tspan></text>
+</svg>

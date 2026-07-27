@@ -1,0 +1,26 @@
+# GENERATED from site/headers.yaml by scripts/render-adapters.py.
+# Do not edit: the neutral manifest is the source of truth.
+
+/index.html
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/sw.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/manifest.webmanifest
+  Cache-Control: no-cache
+  Content-Type: application/manifest+json
+
+/sampler-processor.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
