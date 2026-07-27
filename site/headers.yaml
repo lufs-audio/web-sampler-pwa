@@ -1,0 +1,34 @@
+# Neutral caching + security intent. Rendered per-adapter by
+# scripts/render-adapters.py (Cloudflare Pages `_headers`); never hand-written
+# per host. website-portability 01: the neutral manifest is authoritative.
+#
+# PWA correctness: sw.js, the HTML entry, the manifest, and the AudioWorklet
+# processor MUST NOT be long-cached or clients get stuck on stale logic. Only
+# Vite's content-hashed assets/ bundles get immutable caching (RFC 8246) —
+# their URL changes whenever their content does.
+headers:
+  - path: /index.html
+    values:
+      Cache-Control: "no-cache"
+      X-Content-Type-Options: "nosniff"
+  - path: /sw.js
+    values:
+      Cache-Control: "no-cache"
+      X-Content-Type-Options: "nosniff"
+  - path: /manifest.webmanifest
+    values:
+      Cache-Control: "no-cache"
+      Content-Type: "application/manifest+json"
+  # Not content-hashed (loaded by URL from AudioWorklet.addModule) — must revalidate.
+  - path: /sampler-processor.js
+    values:
+      Cache-Control: "no-cache"
+      X-Content-Type-Options: "nosniff"
+  - path: /assets/*
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+      X-Content-Type-Options: "nosniff"
+  - path: /fonts/*
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+      X-Content-Type-Options: "nosniff"

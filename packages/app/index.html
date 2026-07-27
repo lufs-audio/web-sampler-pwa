@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#111214" />
 <link rel="manifest" href="manifest.webmanifest" />
 <title>LUFS Web Sampler</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600;700;800&family=Public+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<!-- Self-hosted type: keeps the artifact at ZERO external origins so the PWA
+     is genuinely offline (a Google Fonts link left the type uncached offline). -->
+<link rel="stylesheet" href="./fonts.css" />
 <style>
 /* ============================================================= LUFS tokens */
 :root{
@@ -423,7 +423,7 @@ body.dragging::after{content:'⤓  DROP AUDIO ONTO A PAD TO LOAD';position:fixed
         lufs<span style="color:var(--teal)">.</span> web sampler — v0.1<br>
         engine: ciani · verifiable dsp core<br>
         surface: amacher<br>
-        repo: <a href="https://github.com/danialrami/lufs-web-sampler" target="_blank" rel="noopener noreferrer">danialrami/lufs-web-sampler</a>
+        repo: <a href="https://github.com/lufs-audio/web-sampler-pwa" target="_blank" rel="noopener noreferrer">lufs-audio/web-sampler-pwa</a>
       </div>
     </div>
 

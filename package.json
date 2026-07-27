@@ -5,14 +5,20 @@
   "type": "module",
   "description": "A browser-native sampler — Koala's soul, honestly scoped to the web — built on a verifiable, portable DSP core.",
   "license": "GPL-3.0-or-later",
-  "workspaces": ["packages/sampler-core", "packages/app"],
-  "engines": { "node": ">=22.6" },
+  "workspaces": [
+    "packages/sampler-core",
+    "packages/app"
+  ],
+  "engines": {
+    "node": ">=22.6"
+  },
   "scripts": {
     "test": "node --test packages/sampler-core/test/core.test.ts",
     "precheck": "node scripts/precheck.mjs",
-    "build": "npm run build --workspace @lufs/web-sampler-app",
+    "build": "npm run fonts && npm run build --workspace @lufs/web-sampler-app && python3 scripts/render-adapters.py packages/app/dist site",
     "build:demo": "node scripts/build-demo.mjs",
     "verify": "node scripts/verify-artifact.mjs",
-    "ci": "npm run precheck && npm test && npm run build && npm run verify"
+    "ci": "npm run precheck && npm test && npm run build && npm run verify",
+    "fonts": "node scripts/decode-fonts.mjs"
   }
 }

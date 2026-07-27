@@ -5,3 +5,7 @@ dist/
 coverage/
 *.tsbuildinfo
 demo-standalone.html
+
+# Generated at build time from packages/app/fonts.b64.json by scripts/decode-fonts.mjs.
+# The base64 snapshot is the committed source of truth; these are derived bytes.
+packages/app/public/fonts/

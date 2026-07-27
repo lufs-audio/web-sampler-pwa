@@ -1,0 +1,6 @@
+# SPA fallback: a single entry point, so any unmatched path serves index.html
+# with a 200 (not a redirect) — the app routes client-side from there.
+redirects:
+  - from: /*
+    to: /index.html
+    status: 200
