@@ -1,7 +1,16 @@
 // Minimal offline shell. Cache-first for the app shell so the sampler opens
 // with no network once installed. Audio the user records lives in OPFS, not here.
-const CACHE = 'lufs-web-sampler-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './sampler-processor.js', './icon.svg'];
+const CACHE = 'lufs-web-sampler-v2';
+const SHELL = [
+  './', './index.html', './manifest.webmanifest', './sampler-processor.js', './icon.svg',
+  // Self-hosted type — precached so an offline launch renders in the real
+  // typeface instead of silently degrading to system fonts.
+  './fonts.css',
+  './fonts/host-grotesk-var-latin.woff2',
+  './fonts/public-sans-var-latin.woff2',
+  './fonts/space-mono-400-latin.woff2',
+  './fonts/space-mono-700-latin.woff2',
+];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

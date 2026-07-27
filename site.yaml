@@ -1,35 +1,54 @@
-# Neutral, target-independent build manifest (website-portability KB, rule 01).
-# The host is a swappable adapter; this file is the source of truth for how the
-# site is built and where its output lives.
-name: lufs-web-sampler
-description: Browser-native sampler PWA built on a verifiable DSP core.
-
+# LUFS website-portability manifest (docs/infra/website-portability 01).
+# Target-independent source of truth for build, output, routes, and domains.
+# The host is a swappable adapter; nothing below is Cloudflare-specific.
+schema_version: 1
+site_id: lufs-web-sampler
+canonical_url: https://sampler.lufs.audio
+source:
+  repository: lufs-audio/web-sampler-pwa
+  production_ref: main
 build:
-  node_version_file: .nvmrc
-  install: npm ci
-  test: npm test
-  command: npm run build
-  verify: npm run verify
+  command: npm run ci        # precheck -> test -> build once -> fail-closed verify
   output_dir: packages/app/dist
-
+  toolchain:
+    node: "24"               # pinned in-repo via .nvmrc
+    package_manager: "npm"
+  lockfiles:
+    - package-lock.json
+runtime:
+  kind: static
+  index: index.html
+  error_document: index.html
+  # Single entry point; unknown paths fall back to index.html. Built with
+  # Vite base './' so the same bytes run at any domain or subpath.
+  spa_fallback: true
+  max_asset_bytes: 26214400  # 25 MiB (lowest active host: Cloudflare Pages)
+  pwa:
+    installable: true
+    offline: true            # app shell precached; recorded audio lives in OPFS
+    manifest: /manifest.webmanifest
+    service_worker: /sw.js
+  # Cross-origin isolation is NOT required today (no SharedArrayBuffer / WASM
+  # threads). If the core ever moves hot paths to threaded WASM, add
+  # Cross-Origin-Opener-Policy: same-origin and
+  # Cross-Origin-Embedder-Policy: require-corp to site/headers.yaml.
+# Canonical route list lives in site/routes.txt — scripts/verify-artifact.mjs
+# reads it directly so the manifest and the verifier can never drift apart.
 routes:
-  spa: true          # single entry; unknown paths fall back to index.html
-  base: relative     # built with base './' so it runs at any domain/subpath
-
-pwa:
-  service_worker: sw.js
-  manifest: manifest.webmanifest
-  # cross-origin isolation is NOT required today (no SharedArrayBuffer / WASM
-  # threads yet). If/when the core moves hot paths to threaded WASM, set:
-  #   Cross-Origin-Opener-Policy: same-origin
-  #   Cross-Origin-Embedder-Policy: require-corp
-
-deploy:
-  # Primary managed edge per the KB is Cloudflare Pages (Git integration).
-  # The output-branch adapter (hosting-provider-static-deploy) is the fallback
-  # for pull-based static hosts and DR.
-  primary: cloudflare-pages
-  adapter: output-branch
-  output_branch: deploy
-
-domains: []          # none assigned yet
+  source: site/routes.txt
+external_origins: []         # zero: type is self-hosted, no runtime API calls
+domains:
+  - sampler.lufs.audio
+# Generated host adapters, rendered from site/*.yaml by scripts/render-adapters.py.
+adapters:
+  cloudflare_pages:
+    headers: _headers
+    redirects: _redirects    # SPA fallback rule
+    deploy_branch: site
+release:
+  artifact_name: site.tar.gz
+  retain: 20
+verification:
+  content_probe: /index.html
+  content_marker: "sampler"
+  smoke_timeout_seconds: 10

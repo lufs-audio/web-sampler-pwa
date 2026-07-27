@@ -1,0 +1,68 @@
+# website-portability output-branch adapter, fail-closed:
+#   checkout -> node (.nvmrc) -> npm ci -> precheck -> test -> build ONCE
+#     -> VERIFY artifact -> retain off-host -> publish to the `site` branch
+#
+# Runs on the self-hosted lufs fleet (agent-knowledge docs/infra/ci-and-runners/08).
+#
+# CLOUDFLARE PAGES SETUP (the intended production edge):
+#   Production branch: site
+#   Build command:     (leave EMPTY)
+#   Output directory:  /
+#   The `site` branch holds the built, verified artifact — Pages must NOT rebuild
+#   it (02: a deployment adapter must not compile source again). The generated
+#   _headers and _redirects files ride along in the artifact and Pages applies them.
+name: build-verify-deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # least privilege: only what publishing the output branch needs
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: [self-hosted, lufs]
+    steps:
+      # Third-party actions pinned to commit SHAs (KB 02/08 security policy).
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      # The fleet's runner image is LEAN and jobs run as root (no sudo).
+      # `npm run build` shells out to python3 to render the host adapters, so
+      # install the SYSTEM python — never actions/setup-python, which has no
+      # arm64 build and dies on the continuo Pis (KB 08 rule 2).
+      - name: Install build prerequisites (system python3, no sudo)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 ca-certificates
+          python3 --version
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci                # frozen install against the committed lockfile
+      - run: npm run precheck      # DSP contract must pass first
+      - run: npm test              # full metamorphic battery
+      - run: npm run build         # fonts -> build ONCE -> render host adapters
+      - run: npm run verify        # fail-closed: exit 0 is not enough
+      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882  # v4.4.3
+        with:                      # retain the build off-host (DR copy)
+          name: site-dist-${{ github.sha }}
+          path: packages/app/dist
+          if-no-files-found: error
+      - uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e  # v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: packages/app/dist
+          publish_branch: site
+          commit_message: "deploy ${{ github.sha }}"
+
+# ROLLBACK (KB rule 7): re-run from a known-good SHA (Actions -> Run workflow), or revert
+# the `site` branch to its previous deploy commit. Never rebuild old source and call it a
+# rollback — redeploy the retained good build.

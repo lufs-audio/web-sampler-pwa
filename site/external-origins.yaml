@@ -1,0 +1,4 @@
+# The sampler makes ZERO cross-origin requests at runtime. All DSP is local, the
+# type is self-hosted, and user audio lives in OPFS on the device — never uploaded.
+# This emptiness is a portability strength and is asserted by scripts/verify-artifact.mjs.
+external_origins: []
