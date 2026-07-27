@@ -3,7 +3,7 @@
 # The host is a swappable adapter; nothing below is Cloudflare-specific.
 schema_version: 1
 site_id: lufs-web-sampler
-canonical_url: https://sampler.lufs.audio     # PLACEHOLDER — no domain assigned yet
+canonical_url: https://sampler.lufs.audio
 source:
   repository: lufs-audio/web-sampler-pwa
   production_ref: main
@@ -37,7 +37,8 @@ runtime:
 routes:
   source: site/routes.txt
 external_origins: []         # zero: type is self-hosted, no runtime API calls
-domains: []                  # none assigned yet
+domains:
+  - sampler.lufs.audio
 # Generated host adapters, rendered from site/*.yaml by scripts/render-adapters.py.
 adapters:
   cloudflare_pages:
