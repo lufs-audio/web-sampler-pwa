@@ -2,6 +2,8 @@
 #   checkout -> node (.nvmrc) -> npm ci -> precheck -> test -> build ONCE
 #     -> VERIFY artifact -> retain off-host -> publish to the `site` branch
 #
+# Runs on the self-hosted lufs fleet (agent-knowledge docs/infra/ci-and-runners/08).
+#
 # CLOUDFLARE PAGES SETUP (the intended production edge):
 #   Production branch: site
 #   Build command:     (leave EMPTY)
@@ -29,6 +31,17 @@ jobs:
     steps:
       # Third-party actions pinned to commit SHAs (KB 02/08 security policy).
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      # The fleet's runner image is LEAN and jobs run as root (no sudo).
+      # `npm run build` shells out to python3 to render the host adapters, so
+      # install the SYSTEM python — never actions/setup-python, which has no
+      # arm64 build and dies on the continuo Pis (KB 08 rule 2).
+      - name: Install build prerequisites (system python3, no sudo)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 ca-certificates
+          python3 --version
+
       - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
         with:
           node-version-file: .nvmrc
