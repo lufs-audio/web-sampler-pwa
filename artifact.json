@@ -3,16 +3,16 @@
   "site_id": "lufs-web-sampler",
   "source": {
     "repository": "lufs-audio/web-sampler-pwa",
-    "commit": "18c1d054a8441c931259f6dbcf40acb48cdd2d23"
+    "commit": "4be57a0213f4f82566461c36c22f3262dea53a3d"
   },
   "build": {
     "builder": "github-actions",
     "command": "npm run ci",
-    "builtAt": "2026-07-27T06:22:51.704Z"
+    "builtAt": "2026-08-13T02:53:20.923Z"
   },
   "artifact": {
     "files": 14,
-    "contentId": "lws-80d0b678",
-    "sha256": "80d0b6780e44572494fe922eaed2f77f2208e686dbc38d84e72b222497e6eca2"
+    "contentId": "lws-26141466",
+    "sha256": "26141466ecdb2bc158227ce68c4eaeacf990ee091ff60ea9d87fc864f6716a1e"
   }
 }

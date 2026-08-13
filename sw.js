@@ -1,6 +1,6 @@
 // Minimal offline shell. Cache-first for the app shell so the sampler opens
 // with no network once installed. Audio the user records lives in OPFS, not here.
-const CACHE = 'lufs-web-sampler-v4';
+const CACHE = 'lufs-web-sampler-v5';
 // The canonical shell URL. Deliberately "./" and never "./index.html":
 // hosts commonly 308 the latter to the former, and a redirected response
 // cannot satisfy a navigation.
@@ -58,6 +58,11 @@ async function handleNavigation() {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+
+  // Cross-origin requests (the analytics beacon) are none of the shell's business:
+  // let the browser own them, so nothing third-party lands in the cache and a failed
+  // analytics fetch can never be answered with the app shell.
+  if (!req.url.startsWith(self.location.origin)) return;
 
   if (req.mode === 'navigate') {
     e.respondWith(handleNavigation());
