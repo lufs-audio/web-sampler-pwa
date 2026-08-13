@@ -1,1 +1,55 @@
-IyBMVUZTIHdlYnNpdGUtcG9ydGFiaWxpdHkgbWFuaWZlc3QgKGRvY3MvaW5mcmEvd2Vic2l0ZS1wb3J0YWJpbGl0eSAwMSkuCiMgVGFyZ2V0LWluZGVwZW5kZW50IHNvdXJjZSBvZiB0cnV0aCBmb3IgYnVpbGQsIG91dHB1dCwgcm91dGVzLCBhbmQgZG9tYWlucy4KIyBUaGUgaG9zdCBpcyBhIHN3YXBwYWJsZSBhZGFwdGVyOyBub3RoaW5nIGJlbG93IGlzIENsb3VkZmxhcmUtc3BlY2lmaWMuCnNjaGVtYV92ZXJzaW9uOiAxCnNpdGVfaWQ6IGx1ZnMtd2ViLXNhbXBsZXIKY2Fub25pY2FsX3VybDogaHR0cHM6Ly9zYW1wbGVyLmx1ZnMuYXVkaW8Kc291cmNlOgogIHJlcG9zaXRvcnk6IGx1ZnMtYXVkaW8vd2ViLXNhbXBsZXItcHdhCiAgcHJvZHVjdGlvbl9yZWY6IG1haW4KYnVpbGQ6CiAgY29tbWFuZDogbnBtIHJ1biBjaSAgICAgICAgIyBwcmVjaGVjayAtPiB0ZXN0IC0+IGJ1aWxkIG9uY2UgLT4gZmFpbC1jbG9zZWQgdmVyaWZ5CiAgb3V0cHV0X2RpcjogcGFja2FnZXMvYXBwL2Rpc3QKICB0b29sY2hhaW46CiAgICBub2RlOiAiMjQiICAgICAgICAgICAgICAgIyBwaW5uZWQgaW4tcmVwbyB2aWEgLm52bXJjCiAgICBwYWNrYWdlX21hbmFnZXI6ICJucG0iCiAgbG9ja2ZpbGVzOgogICAgLSBwYWNrYWdlLWxvY2suanNvbgpydW50aW1lOgogIGtpbmQ6IHN0YXRpYwogIGluZGV4OiBpbmRleC5odG1sCiAgZXJyb3JfZG9jdW1lbnQ6IGluZGV4Lmh0bWwKICAjIFNpbmdsZSBlbnRyeSBwb2ludDsgdW5rbm93biBwYXRocyBmYWxsIGJhY2sgdG8gaW5kZXguaHRtbC4gQnVpbHQgd2l0aAogICMgVml0ZSBiYXNlICcuLycgc28gdGhlIHNhbWUgYnl0ZXMgcnVuIGF0IGFueSBkb21haW4gb3Igc3VicGF0aC4KICBzcGFfZmFsbGJhY2s6IHRydWUKICBtYXhfYXNzZXRfYnl0ZXM6IDI2MjE0NDAwICAjIDI1IE1pQiAobG93ZXN0IGFjdGl2ZSBob3N0OiBDbG91ZGZsYXJlIFBhZ2VzKQogIHB3YToKICAgIGluc3RhbGxhYmxlOiB0cnVlCiAgICBvZmZsaW5lOiB0cnVlICAgICAgICAgICAgIyBhcHAgc2hlbGwgcHJlY2FjaGVkOyByZWNvcmRlZCBhdWRpbyBsaXZlcyBpbiBPUEZTCiAgICBtYW5pZmVzdDogL21hbmlmZXN0LndlYm1hbmlmZXN0CiAgICBzZXJ2aWNlX3dvcmtlcjogL3N3LmpzCiAgIyBDcm9zcy1vcmlnaW4gaXNvbGF0aW9uIGlzIE5PVCByZXF1aXJlZCB0b2RheSAobm8gU2hhcmVkQXJyYXlCdWZmZXIgLyBXQVNNCiAgIyB0aHJlYWRzKS4gSWYgdGhlIGNvcmUgZXZlciBtb3ZlcyBob3QgcGF0aHMgdG8gdGhyZWFkZWQgV0FTTSwgYWRkCiAgIyBDcm9zcy1PcmlnaW4tT3BlbmVyLVBvbGljeTogc2FtZS1vcmlnaW4gYW5kCiAgIyBDcm9zcy1PcmlnaW4tRW1iZWRkZXItUG9saWN5OiByZXF1aXJlLWNvcnAgdG8gc2l0ZS9oZWFkZXJzLnlhbWwuCiMgQ2Fub25pY2FsIHJvdXRlIGxpc3QgbGl2ZXMgaW4gc2l0ZS9yb3V0ZXMudHh0IOKAlCBzY3JpcHRzL3ZlcmlmeS1hcnRpZmFjdC5tanMKIyByZWFkcyBpdCBkaXJlY3RseSBzbyB0aGUgbWFuaWZlc3QgYW5kIHRoZSB2ZXJpZmllciBjYW4gbmV2ZXIgZHJpZnQgYXBhcnQuCnJvdXRlczoKICBzb3VyY2U6IHNpdGUvcm91dGVzLnR4dApleHRlcm5hbF9vcmlnaW5zOgogIC0gdXJsOiBodHRwczovL3VtYW1pLmx1ZnNocS5jb20vc2NyaXB0LmpzICAjIHNlbGYtaG9zdGVkIFVtYW1pOyBkZWZlcnJlZCwgYW5hbHl0aWNzLW9ubHksIGV4Y2x1ZGVkIGZyb20gU1cgY2FjaGUKZG9tYWluczoKICAtIHNhbXBsZXIubHVmcy5hdWRpbwojIEdlbmVyYXRlZCBob3N0IGFkYXB0ZXJzLCByZW5kZXJlZCBmcm9tIHNpdGUvKi55YW1sIGJ5IHNjcmlwdHMvcmVuZGVyLWFkYXB0ZXJzLnB5LgphZGFwdGVyczoKICBjbG91ZGZsYXJlX3BhZ2VzOgogICAgaGVhZGVyczogX2hlYWRlcnMKICAgIHJlZGlyZWN0czogX3JlZGlyZWN0cyAgICAjIFNQQSBmYWxsYmFjayBydWxlCiAgICBkZXBsb3lfYnJhbmNoOiBzaXRlCnJlbGVhc2U6CiAgYXJ0aWZhY3RfbmFtZTogc2l0ZS50YXIuZ3oKICByZXRhaW46IDIwCnZlcmlmaWNhdGlvbjoKICBjb250ZW50X3Byb2JlOiAvaW5kZXguaHRtbAogIGNvbnRlbnRfbWFya2VyOiAic2FtcGxlciIKICBzbW9rZV90aW1lb3V0X3NlY29uZHM6IDEwCg==
+# LUFS website-portability manifest (docs/infra/website-portability 01).
+# Target-independent source of truth for build, output, routes, and domains.
+# The host is a swappable adapter; nothing below is Cloudflare-specific.
+schema_version: 1
+site_id: lufs-web-sampler
+canonical_url: https://sampler.lufs.audio
+source:
+  repository: lufs-audio/web-sampler-pwa
+  production_ref: main
+build:
+  command: npm run ci        # precheck -> test -> build once -> fail-closed verify
+  output_dir: packages/app/dist
+  toolchain:
+    node: "24"               # pinned in-repo via .nvmrc
+    package_manager: "npm"
+  lockfiles:
+    - package-lock.json
+runtime:
+  kind: static
+  index: index.html
+  error_document: index.html
+  # Single entry point; unknown paths fall back to index.html. Built with
+  # Vite base './' so the same bytes run at any domain or subpath.
+  spa_fallback: true
+  max_asset_bytes: 26214400  # 25 MiB (lowest active host: Cloudflare Pages)
+  pwa:
+    installable: true
+    offline: true            # app shell precached; recorded audio lives in OPFS
+    manifest: /manifest.webmanifest
+    service_worker: /sw.js
+  # Cross-origin isolation is NOT required today (no SharedArrayBuffer / WASM
+  # threads). If the core ever moves hot paths to threaded WASM, add
+  # Cross-Origin-Opener-Policy: same-origin and
+  # Cross-Origin-Embedder-Policy: require-corp to site/headers.yaml.
+# Canonical route list lives in site/routes.txt — scripts/verify-artifact.mjs
+# reads it directly so the manifest and the verifier can never drift apart.
+routes:
+  source: site/routes.txt
+external_origins:
+  - url: https://umami.lufshq.com/script.js  # self-hosted Umami; deferred, analytics-only, excluded from SW cache
+domains:
+  - sampler.lufs.audio
+# Generated host adapters, rendered from site/*.yaml by scripts/render-adapters.py.
+adapters:
+  cloudflare_pages:
+    headers: _headers
+    redirects: _redirects    # SPA fallback rule
+    deploy_branch: site
+release:
+  artifact_name: site.tar.gz
+  retain: 20
+verification:
+  content_probe: /index.html
+  content_marker: "sampler"
+  smoke_timeout_seconds: 10
