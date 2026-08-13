@@ -1,4 +1,12 @@
-# The sampler makes ZERO cross-origin requests at runtime. All DSP is local, the
-# type is self-hosted, and user audio lives in OPFS on the device — never uploaded.
-# This emptiness is a portability strength and is asserted by scripts/verify-artifact.mjs.
-external_origins: []
+# The sampler adds exactly one cross-origin subresource: self-hosted Umami
+# analytics at umami.lufshq.com (our own infrastructure). All DSP is still
+# local, the type is still self-hosted, and user audio lives in OPFS on the
+# device — never uploaded. The analytics script is deferred and excluded from
+# the service worker cache; the sampler still loads and plays offline even if
+# this origin is unreachable.
+external_origins:
+  - url: https://umami.lufshq.com/script.js
+    note: >-
+      Self-hosted Umami (our own box). Deferred, analytics-only, excluded from the
+      service worker cache — the sampler still loads and plays offline with this
+      origin unreachable, and recorded audio never leaves the device.

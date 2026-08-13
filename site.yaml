@@ -36,7 +36,8 @@ runtime:
 # reads it directly so the manifest and the verifier can never drift apart.
 routes:
   source: site/routes.txt
-external_origins: []         # zero: type is self-hosted, no runtime API calls
+external_origins:
+  - url: https://umami.lufshq.com/script.js  # self-hosted Umami; deferred, analytics-only, excluded from SW cache
 domains:
   - sampler.lufs.audio
 # Generated host adapters, rendered from site/*.yaml by scripts/render-adapters.py.
