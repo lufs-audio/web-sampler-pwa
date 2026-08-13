@@ -1,1 +1,80 @@
-Ly8gTWluaW1hbCBvZmZsaW5lIHNoZWxsLiBDYWNoZS1maXJzdCBmb3IgdGhlIGFwcCBzaGVsbCBzbyB0aGUgc2FtcGxlciBvcGVucwovLyB3aXRoIG5vIG5ldHdvcmsgb25jZSBpbnN0YWxsZWQuIEF1ZGlvIHRoZSB1c2VyIHJlY29yZHMgbGl2ZXMgaW4gT1BGUywgbm90IGhlcmUuCmNvbnN0IENBQ0hFID0gJ2x1ZnMtd2ViLXNhbXBsZXItdjUnOwovLyBUaGUgY2Fub25pY2FsIHNoZWxsIFVSTC4gRGVsaWJlcmF0ZWx5ICIuLyIgYW5kIG5ldmVyICIuL2luZGV4Lmh0bWwiOgovLyBob3N0cyBjb21tb25seSAzMDggdGhlIGxhdHRlciB0byB0aGUgZm9ybWVyLCBhbmQgYSByZWRpcmVjdGVkIHJlc3BvbnNlCi8vIGNhbm5vdCBzYXRpc2Z5IGEgbmF2aWdhdGlvbi4KY29uc3QgU0hFTExfVVJMID0gIi4vIjsKY29uc3QgU0hFTEwgPSBbCiAgJy4vJywgJy4vbWFuaWZlc3Qud2VibWFuaWZlc3QnLCAnLi9zYW1wbGVyLXByb2Nlc3Nvci5qcycsICcuL2ljb24uc3ZnJywKICAvLyBTZWxmLWhvc3RlZCB0eXBlIOKAlCBwcmVjYWNoZWQgc28gYW4gb2ZmbGluZSBsYXVuY2ggcmVuZGVycyBpbiB0aGUgcmVhbAogIC8vIHR5cGVmYWNlIGluc3RlYWQgb2Ygc2lsZW50bHkgZGVncmFkaW5nIHRvIHN5c3RlbSBmb250cy4KICAnLi9mb250cy5jc3MnLAogICcuL2ZvbnRzL2hvc3QtZ3JvdGVzay12YXItbGF0aW4ud29mZjInLAogICcuL2ZvbnRzL3B1YmxpYy1zYW5zLXZhci1sYXRpbi53b2ZmMicsCiAgJy4vZm9udHMvc3BhY2UtbW9uby00MDAtbGF0aW4ud29mZjInLAogICcuL2ZvbnRzL3NwYWNlLW1vbm8tNzAwLWxhdGluLndvZmYyJywKXTsKCnNlbGYuYWRkRXZlbnRMaXN0ZW5lcignaW5zdGFsbCcsIChlKSA9PiB7CiAgZS53YWl0VW50aWwoY2FjaGVzLm9wZW4oQ0FDSEUpLnRoZW4oKGMpID0+IGMuYWRkQWxsKFNIRUxMKSkudGhlbigoKSA9PiBzZWxmLnNraXBXYWl0aW5nKCkpKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2FjdGl2YXRlJywgKGUpID0+IHsKICBlLndhaXRVbnRpbCgKICAgIGNhY2hlcy5rZXlzKCkudGhlbigoa2V5cykgPT4gUHJvbWlzZS5hbGwoa2V5cy5maWx0ZXIoKGspID0+IGsgIT09IENBQ0hFKS5tYXAoKGspID0+IGNhY2hlcy5kZWxldGUoaykpKSkudGhlbigoKSA9PiBzZWxmLmNsaWVudHMuY2xhaW0oKSkKICApOwp9KTsKCi8vIC0tLSBuYXZpZ2F0aW9uIGhhbmRsaW5nIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi8vIE5hdmlnYXRpb24gcmVxdWVzdHMgdXNlIHJlZGlyZWN0IG1vZGUgIm1hbnVhbCI6IHRoZSBicm93c2VyIHJlamVjdHMgYW55Ci8vIHJlc3BvbnNlIHdob3NlIC5yZWRpcmVjdGVkIGlzIHRydWUgYXMgYSBuZXR3b3JrIGVycm9yIChFUlJfRkFJTEVEKS4gQ2xvdWRmbGFyZQovLyBQYWdlcyAzMDgtcmVkaXJlY3RzIC9pbmRleC5odG1sIC0+IC8sIGFuZCBhIHJlZGlyZWN0ZWQgcmVzcG9uc2UgU1RBWVMgZmxhZ2dlZAovLyBldmVuIGFmdGVyIGJlaW5nIHN0b3JlZCBpbiB0aGUgQ2FjaGUgQVBJICh3M2MvU2VydmljZVdvcmtlciM3MzcpIOKAlCBzbyBib3RoIHRoZQovLyBuZXR3b3JrIHBhdGggYW5kIGEgbmFpdmUgY2FjaGUgaGl0IHByb2R1Y2Ugb25lLiBIZW5jZTogcHJlY2FjaGUgIi4vIiAoYSBjbGVhbgovLyAyMDApIGFuZCBzdHJpcCB0aGUgZmxhZyBkZWZlbnNpdmVseSBiZWZvcmUgcmVzcG9uZGluZy4KYXN5bmMgZnVuY3Rpb24gY2xlYW5SZWRpcmVjdChyZXMpIHsKICBpZiAoIXJlcyB8fCAhcmVzLnJlZGlyZWN0ZWQpIHJldHVybiByZXM7CiAgY29uc3QgYm9keSA9IGF3YWl0IHJlcy5jbG9uZSgpLmJsb2IoKTsKICByZXR1cm4gbmV3IFJlc3BvbnNlKGJvZHksIHsKICAgIHN0YXR1czogcmVzLnN0YXR1cywKICAgIHN0YXR1c1RleHQ6IHJlcy5zdGF0dXNUZXh0LAogICAgaGVhZGVyczogcmVzLmhlYWRlcnMsCiAgfSk7Cn0KCmFzeW5jIGZ1bmN0aW9uIGhhbmRsZU5hdmlnYXRpb24oKSB7CiAgY29uc3QgY2FjaGVkID0gYXdhaXQgY2FjaGVzLm1hdGNoKFNIRUxMX1VSTCk7CiAgaWYgKGNhY2hlZCkgcmV0dXJuIGNsZWFuUmVkaXJlY3QoY2FjaGVkKTsKICB0cnkgewogICAgcmV0dXJuIGF3YWl0IGNsZWFuUmVkaXJlY3QoYXdhaXQgZmV0Y2goU0hFTExfVVJMKSk7CiAgfSBjYXRjaCAoZXJyKSB7CiAgICBjb25zdCBmYWxsYmFjayA9IGF3YWl0IGNhY2hlcy5tYXRjaChTSEVMTF9VUkwpOwogICAgaWYgKGZhbGxiYWNrKSByZXR1cm4gY2xlYW5SZWRpcmVjdChmYWxsYmFjayk7CiAgICB0aHJvdyBlcnI7CiAgfQp9CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgKGUpID0+IHsKICBjb25zdCByZXEgPSBlLnJlcXVlc3Q7CiAgaWYgKHJlcS5tZXRob2QgIT09ICdHRVQnKSByZXR1cm47CgogIC8vIENyb3NzLW9yaWdpbiByZXF1ZXN0cyAodGhlIGFuYWx5dGljcyBiZWFjb24pIGFyZSBub25lIG9mIHRoZSBzaGVsbCdzIGJ1c2luZXNzOgogIC8vIGxldCB0aGUgYnJvd3NlciBvd24gdGhlbSwgc28gbm90aGluZyB0aGlyZC1wYXJ0eSBsYW5kcyBpbiB0aGUgY2FjaGUgYW5kIGEgZmFpbGVkCiAgLy8gYW5hbHl0aWNzIGZldGNoIGNhbiBuZXZlciBiZSBhbnN3ZXJlZCB3aXRoIHRoZSBhcHAgc2hlbGwuCiAgaWYgKCFyZXEudXJsLnN0YXJ0c1dpdGgoc2VsZi5sb2NhdGlvbi5vcmlnaW4pKSByZXR1cm47CgogIGlmIChyZXEubW9kZSA9PT0gJ25hdmlnYXRlJykgewogICAgZS5yZXNwb25kV2l0aChoYW5kbGVOYXZpZ2F0aW9uKCkpOwogICAgcmV0dXJuOwogIH0KCgogIGUucmVzcG9uZFdpdGgoCiAgICBjYWNoZXMubWF0Y2gocmVxKS50aGVuKChoaXQpID0+IGhpdCB8fCBmZXRjaChyZXEpLnRoZW4oKHJlcykgPT4gewogICAgICBjb25zdCBjb3B5ID0gcmVzLmNsb25lKCk7CiAgICAgIGNhY2hlcy5vcGVuKENBQ0hFKS50aGVuKChjKSA9PiBjLnB1dChyZXEsIGNvcHkpKS5jYXRjaCgoKSA9PiB7fSk7CiAgICAgIHJldHVybiByZXM7CiAgICB9KS5jYXRjaCgoKSA9PiBjYWNoZXMubWF0Y2goU0hFTExfVVJMKSkpCiAgKTsKfSk7Cg==
+// Minimal offline shell. Cache-first for the app shell so the sampler opens
+// with no network once installed. Audio the user records lives in OPFS, not here.
+const CACHE = 'lufs-web-sampler-v5';
+// The canonical shell URL. Deliberately "./" and never "./index.html":
+// hosts commonly 308 the latter to the former, and a redirected response
+// cannot satisfy a navigation.
+const SHELL_URL = "./";
+const SHELL = [
+  './', './manifest.webmanifest', './sampler-processor.js', './icon.svg',
+  // Self-hosted type — precached so an offline launch renders in the real
+  // typeface instead of silently degrading to system fonts.
+  './fonts.css',
+  './fonts/host-grotesk-var-latin.woff2',
+  './fonts/public-sans-var-latin.woff2',
+  './fonts/space-mono-400-latin.woff2',
+  './fonts/space-mono-700-latin.woff2',
+];
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())
+  );
+});
+
+// --- navigation handling -----------------------------------------------------
+// Navigation requests use redirect mode "manual": the browser rejects any
+// response whose .redirected is true as a network error (ERR_FAILED). Cloudflare
+// Pages 308-redirects /index.html -> /, and a redirected response STAYS flagged
+// even after being stored in the Cache API (w3c/ServiceWorker#737) — so both the
+// network path and a naive cache hit produce one. Hence: precache "./" (a clean
+// 200) and strip the flag defensively before responding.
+async function cleanRedirect(res) {
+  if (!res || !res.redirected) return res;
+  const body = await res.clone().blob();
+  return new Response(body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+}
+
+async function handleNavigation() {
+  const cached = await caches.match(SHELL_URL);
+  if (cached) return cleanRedirect(cached);
+  try {
+    return await cleanRedirect(await fetch(SHELL_URL));
+  } catch (err) {
+    const fallback = await caches.match(SHELL_URL);
+    if (fallback) return cleanRedirect(fallback);
+    throw err;
+  }
+}
+
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+
+  // Cross-origin requests (the analytics beacon) are none of the shell's business:
+  // let the browser own them, so nothing third-party lands in the cache and a failed
+  // analytics fetch can never be answered with the app shell.
+  if (!req.url.startsWith(self.location.origin)) return;
+
+  if (req.mode === 'navigate') {
+    e.respondWith(handleNavigation());
+    return;
+  }
+
+
+  e.respondWith(
+    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+      const copy = res.clone();
+      caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+      return res;
+    }).catch(() => caches.match(SHELL_URL)))
+  );
+});
